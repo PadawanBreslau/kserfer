@@ -13,6 +13,9 @@ export default defineConfig(({ mode }) => {
         '@shared': path.resolve(__dirname, 'src/shared'),
       },
     },
+    optimizeDeps: {
+      exclude: ['pdfmake'],
+    },
     build: {
       lib: {
         name: 'ksef-fe-invoice-converter',
