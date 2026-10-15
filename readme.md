@@ -14,6 +14,9 @@ Biblioteka do generowania wizualizacji PDF faktur oraz UPO na podstawie plików 
 Repozytorium udostępnia także serwer REST (`src/server`), który generuje PDF na podstawie
 przesłanego pliku XML. Opis uruchomienia znajduje się w [DEV_README.md](DEV_README.md),
 a dokumentacja endpointów w [docs/api.apib](docs/api.apib).
+Instrukcja wdrożenia serwera na Ubuntu 24.04 LTS (nginx, usługi systemd, NVM, użytkownik `ksef`)
+znajduje się w [docs/DEPLOYMENT.pl.md](docs/DEPLOYMENT.pl.md)
+([English version](docs/DEPLOYMENT.md)).
 
 ```bash
 npm run server
