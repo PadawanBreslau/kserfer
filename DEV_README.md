@@ -8,6 +8,8 @@ HTTP: you post an XML file, you get a PDF back.
 - Browser demo app: `src/app-public`
 - REST API: `src/server`
 - API Blueprint documentation: [`docs/api.apib`](docs/api.apib)
+- Production deployment on Ubuntu 24.04 LTS (nginx + systemd + NVM, dedicated `ksef` user):
+  [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) (English), [`docs/DEPLOYMENT.pl.md`](docs/DEPLOYMENT.pl.md) (Polski)
 
 ---
 
@@ -47,6 +49,9 @@ The API listens on <http://localhost:3000> by default and logs the effective add
 npm run server:build   # bundles src/server/main.ts into dist-server/main.js
 npm run server:start   # node dist-server/main.js
 ```
+
+For a complete server setup (dedicated user, NVM, systemd service, nginx reverse proxy, HTTPS)
+follow the [deployment guide](docs/DEPLOYMENT.md) ([po polsku](docs/DEPLOYMENT.pl.md)).
 
 ### Configuration
 
