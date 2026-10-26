@@ -9,7 +9,7 @@ describe('loadConfig', () => {
     expect(config).toEqual({
       host: '0.0.0.0',
       maxUploadSizeBytes: 10 * 1024 * 1024,
-      port: 3000,
+      port: 7321,
     });
   });
 
@@ -22,13 +22,13 @@ describe('loadConfig', () => {
   it('trims the host and ignores blank values', () => {
     expect(loadConfig({ HOST: '  localhost  ' }).host).toBe('localhost');
     expect(loadConfig({ HOST: '   ' }).host).toBe('0.0.0.0');
-    expect(loadConfig({ PORT: '   ' }).port).toBe(3000);
+    expect(loadConfig({ PORT: '   ' }).port).toBe(7321);
   });
 
   it('ignores values that are not positive numbers', () => {
-    expect(loadConfig({ PORT: 'not-a-number' }).port).toBe(3000);
-    expect(loadConfig({ PORT: '-1' }).port).toBe(3000);
-    expect(loadConfig({ PORT: '0' }).port).toBe(3000);
+    expect(loadConfig({ PORT: 'not-a-number' }).port).toBe(7321);
+    expect(loadConfig({ PORT: '-1' }).port).toBe(7321);
+    expect(loadConfig({ PORT: '0' }).port).toBe(7321);
     expect(loadConfig({ MAX_UPLOAD_SIZE_BYTES: 'NaN' }).maxUploadSizeBytes).toBe(10 * 1024 * 1024);
   });
 

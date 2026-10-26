@@ -11,7 +11,7 @@ This guide shows how to run the KSeF PDF generator REST API (`src/server`) on a 
 - **nginx** is the public entry point and proxies requests to the application.
 
 ```
-client ──► nginx :80/:443 ──► 127.0.0.1:3000 (node, user ksef, systemd: ksef-pdf-generator.service)
+client ──► nginx :80/:443 ──► 127.0.0.1:7321 (node, user ksef, systemd: ksef-pdf-generator.service)
 ```
 
 Only the REST API is deployed. The browser demo app (`npm run dev`) is not needed on the server.
@@ -41,7 +41,7 @@ Replace `ksef.example.com` with your own domain name everywhere.
 
 ```bash
 sudo apt update
-sudo apt install -y nginx git curl ca-certificates
+sudo apt install -y nginx git curl
 ```
 
 Create the application user. `--disabled-password` means nobody can log in as `ksef` with a
@@ -128,7 +128,7 @@ exit
 sudo tee /etc/ksef-pdf-generator.env >/dev/null <<'EOF'
 # Listen on the loopback interface only - nginx is the public entry point.
 HOST=127.0.0.1
-PORT=3000
+PORT=7321
 # Maximum accepted XML size in bytes (10 MiB). Keep nginx client_max_body_size above it.
 MAX_UPLOAD_SIZE_BYTES=10485760
 # debug | info | warn | error | silent
@@ -200,7 +200,7 @@ sudo systemctl status ksef-pdf-generator --no-pager
 Check that the application answers locally:
 
 ```bash
-curl http://127.0.0.1:3000/health
+curl http://127.0.0.1:7321/health
 # {"status":"ok","uptime":3}
 ```
 
@@ -222,7 +222,7 @@ server {
     client_max_body_size 11m;
 
     location / {
-        proxy_pass http://127.0.0.1:3000;
+        proxy_pass http://127.0.0.1:7321;
         proxy_http_version 1.1;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
@@ -255,7 +255,7 @@ sudo ufw enable
 sudo ufw status
 ```
 
-Port 3000 is deliberately not opened: the application listens on `127.0.0.1` only.
+Port 7321 is deliberately not opened: the application listens on `127.0.0.1` only.
 
 ## 10. HTTPS (Let's Encrypt)
 
@@ -350,12 +350,12 @@ To move to a newer Node.js 22.x release, run `nvm install 22` (and `nvm alias de
 
 | Symptom | What to check |
 | --- | --- |
-| `502 Bad Gateway` from nginx | The service is down or listens on another port: `sudo systemctl status ksef-pdf-generator`, `ss -ltnp \| grep 3000`; compare `PORT` with `proxy_pass`. |
+| `502 Bad Gateway` from nginx | The service is down or listens on another port: `sudo systemctl status ksef-pdf-generator`, `ss -ltnp \| grep 7321`; compare `PORT` with `proxy_pass`. |
 | `413 Request Entity Too Large` as an HTML page | nginx limit hit. Raise `client_max_body_size` (and `MAX_UPLOAD_SIZE_BYTES` if needed). A JSON `413 PAYLOAD_TOO_LARGE` comes from the application itself. |
 | `status=203/EXEC` in `systemctl status` | `/home/ksef/bin/ksef-pdf-generator.sh` is missing or not executable (`sudo chmod 750 …`). |
 | `nvm: command not found` / `node: command not found` in the journal | NVM is not installed for `ksef`, or no default is set: run `nvm alias default 22` as `ksef`. |
 | `Cannot find module …` / `dist-server/main.js` not found | Run `npm ci && npm run server:build` in `/home/ksef/app` as `ksef`, then restart the service. |
-| `EADDRINUSE` | Another process uses the port: `sudo ss -ltnp \| grep 3000`; pick a different `PORT` and update nginx. |
+| `EADDRINUSE` | Another process uses the port: `sudo ss -ltnp \| grep 7321`; pick a different `PORT` and update nginx. |
 | Changes in `/etc/ksef-pdf-generator.env` have no effect | Restart the service: `sudo systemctl restart ksef-pdf-generator`. |
 
 Useful commands:
