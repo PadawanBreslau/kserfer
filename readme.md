@@ -10,7 +10,7 @@ Set it up - using documentation presented in doc/. Then you can use it as server
 
 ## Example testing:
 
-curl -X POST http://localhost:3000/api/v1/invoices/pdf \
+curl -X POST http://localhost:7321/api/v1/invoices/pdf \
   -F "file=@/path/to/invoice.xml" \
   -F "nrKSeF=5555555555-20250808-9231003CA67B-BE" \
   -o invoice.pdf 

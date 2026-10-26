@@ -11,7 +11,7 @@ serwerze z **Ubuntu 24.04 LTS**:
 - **nginx** jest publicznym punktem wejścia i przekazuje żądania do aplikacji.
 
 ```
-klient ──► nginx :80/:443 ──► 127.0.0.1:3000 (node, użytkownik ksef, systemd: ksef-pdf-generator.service)
+klient ──► nginx :80/:443 ──► 127.0.0.1:7321 (node, użytkownik ksef, systemd: ksef-pdf-generator.service)
 ```
 
 Wdrażane jest tylko REST API. Aplikacja demonstracyjna w przeglądarce (`npm run dev`) nie jest
@@ -42,7 +42,7 @@ Wszędzie zamień `ksef.example.com` na własną nazwę domeny.
 
 ```bash
 sudo apt update
-sudo apt install -y nginx git curl ca-certificates
+sudo apt install -y nginx git curl
 ```
 
 Utwórz użytkownika aplikacji. Opcja `--disabled-password` oznacza, że nikt nie zaloguje się na
@@ -129,7 +129,7 @@ exit
 sudo tee /etc/ksef-pdf-generator.env >/dev/null <<'EOF'
 # Nasłuchiwanie wyłącznie na interfejsie loopback - publicznym punktem wejścia jest nginx.
 HOST=127.0.0.1
-PORT=3000
+PORT=7321
 # Maksymalny rozmiar przyjmowanego pliku XML w bajtach (10 MiB). Wartość client_max_body_size w nginx musi być większa.
 MAX_UPLOAD_SIZE_BYTES=10485760
 # debug | info | warn | error | silent
@@ -202,7 +202,7 @@ sudo systemctl status ksef-pdf-generator --no-pager
 Sprawdź, czy aplikacja odpowiada lokalnie:
 
 ```bash
-curl http://127.0.0.1:3000/health
+curl http://127.0.0.1:7321/health
 # {"status":"ok","uptime":3}
 ```
 
@@ -224,7 +224,7 @@ server {
     client_max_body_size 11m;
 
     location / {
-        proxy_pass http://127.0.0.1:3000;
+        proxy_pass http://127.0.0.1:7321;
         proxy_http_version 1.1;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
@@ -257,7 +257,7 @@ sudo ufw enable
 sudo ufw status
 ```
 
-Port 3000 celowo nie jest otwierany: aplikacja nasłuchuje wyłącznie na `127.0.0.1`.
+Port 7321 celowo nie jest otwierany: aplikacja nasłuchuje wyłącznie na `127.0.0.1`.
 
 ## 10. HTTPS (Let's Encrypt)
 
@@ -352,12 +352,12 @@ Aby przejść na nowsze wydanie Node.js 22.x, uruchom jako `ksef` polecenie `nvm
 
 | Objaw | Co sprawdzić |
 | --- | --- |
-| `502 Bad Gateway` z nginx | Usługa nie działa lub nasłuchuje na innym porcie: `sudo systemctl status ksef-pdf-generator`, `ss -ltnp \| grep 3000`; porównaj `PORT` z `proxy_pass`. |
+| `502 Bad Gateway` z nginx | Usługa nie działa lub nasłuchuje na innym porcie: `sudo systemctl status ksef-pdf-generator`, `ss -ltnp \| grep 7321`; porównaj `PORT` z `proxy_pass`. |
 | `413 Request Entity Too Large` jako strona HTML | Przekroczono limit nginx. Zwiększ `client_max_body_size` (oraz w razie potrzeby `MAX_UPLOAD_SIZE_BYTES`). Odpowiedź JSON `413 PAYLOAD_TOO_LARGE` pochodzi z samej aplikacji. |
 | `status=203/EXEC` w `systemctl status` | Brakuje pliku `/home/ksef/bin/ksef-pdf-generator.sh` lub nie jest wykonywalny (`sudo chmod 750 …`). |
 | `nvm: command not found` / `node: command not found` w dzienniku | NVM nie jest zainstalowany dla `ksef` albo nie ustawiono wersji domyślnej: uruchom `nvm alias default 22` jako `ksef`. |
 | `Cannot find module …` / brak `dist-server/main.js` | Uruchom `npm ci && npm run server:build` w `/home/ksef/app` jako `ksef`, a następnie zrestartuj usługę. |
-| `EADDRINUSE` | Port zajmuje inny proces: `sudo ss -ltnp \| grep 3000`; wybierz inny `PORT` i zaktualizuj nginx. |
+| `EADDRINUSE` | Port zajmuje inny proces: `sudo ss -ltnp \| grep 7321`; wybierz inny `PORT` i zaktualizuj nginx. |
 | Zmiany w `/etc/ksef-pdf-generator.env` nie działają | Zrestartuj usługę: `sudo systemctl restart ksef-pdf-generator`. |
 
 Przydatne polecenia:
